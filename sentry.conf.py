@@ -1,5 +1,6 @@
-import dj_database_url
+#!/usr/bin/env python
 
+import dj_database_url
 import os
 
 CONF_ROOT = os.path.dirname(__file__)
