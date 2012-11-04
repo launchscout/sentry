@@ -27,7 +27,7 @@ if 'MAIL_TO' in os.environ:
     ADMINS = [('J. Doe', os.environ['MAIL_TO'])]
     SENTRY_ADMINS = [os.environ['MAIL_TO']]
 
-SERVER_EMAIL = os.environ.get('SENDGRID_USERNAME')
+SERVER_EMAIL = os.environ.get('MAIL_FROM')
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = os.environ.get('SENDGRID_USERNAME')
