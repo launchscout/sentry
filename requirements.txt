@@ -3,6 +3,7 @@ celery>=3.0
 psycopg2==2.4.5
 dj-database-url==0.2.0
 sentry_campfire==0.1.2
+sentry-github==0.1.1
 requests==0.14.2
 
 -e git+https://github.com/mlafeldt/camplight#egg=camplight
