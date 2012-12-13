@@ -4,6 +4,7 @@ psycopg2==2.4.5
 dj-database-url==0.2.0
 sentry_campfire==0.1.2
 sentry-github==0.1.1
+sentry-pivotal==0.1.0
 requests==0.14.2
 newrelic
 
