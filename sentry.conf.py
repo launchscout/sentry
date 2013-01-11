@@ -14,7 +14,7 @@ SENTRY_KEY = os.environ.get('SENTRY_KEY', 'secret')
 # Set this to false to require authentication
 SENTRY_PUBLIC = False
 
-SENTRY_URL_PREFIX = 'http://gaslight-sentry.herokuapp.com'
+SENTRY_URL_PREFIX = 'http://sentry.gaslight.co'
 
 SENTRY_WEB_HOST = '0.0.0.0'
 SENTRY_WEB_PORT = os.environ.get('PORT', 80)
