@@ -1,4 +1,4 @@
-sentry
+sentry==5.4.5
 celery>=3.0
 psycopg2==2.4.5
 dj-database-url==0.2.0
