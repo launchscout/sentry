@@ -1,5 +1,5 @@
 sentry==5.4.5
-celery>=3.0
+celery==3.0.16
 psycopg2==2.4.5
 dj-database-url==0.2.0
 sentry_campfire==0.1.2
