@@ -1,2 +1,8 @@
 .env
 /sentry/
+.Python
+/bin
+/include
+/lib
+/local
+
