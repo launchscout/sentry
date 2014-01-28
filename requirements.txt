@@ -40,7 +40,7 @@ raven==4.0.3
 redis==2.8.0
 requests==2.2.1
 sentry==6.4.4
-sentry-campfire==0.1.2
+-e git+https://github.com/getsentry/sentry-campfire.git@cdd43180bd2d2e78317ee0840bc086747076a6c7#egg=sentry_campfire-master
 sentry-flowdock==0.1.1
 sentry-github==0.1.2
 -e git+https://github.com/getsentry/sentry-trello.git@198ae6e05c2d525c37a317db2b6e1f7bd73abe21#egg=sentry_trello-master
