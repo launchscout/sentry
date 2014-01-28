@@ -54,6 +54,7 @@ EMAIL_SUBJECT_PREFIX = '[Sentry] '
 # The reply-to email address for outgoing mail.
 SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'root@localhost')
 
+ALLOWED_HOSTS = ["localhost", "gaslight-sentry.herokuapp.com", ".gaslight.co"]
 
 # Bcrypt
 # ------
