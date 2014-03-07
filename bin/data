@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+dropdb sentry_development
+createdb sentry_development
+
+heroku pgbackups:capture --expire --app gaslight-sentry
+curl -Lo latest.dump `heroku pgbackups:url --app gaslight-sentry`
+pg_restore --verbose --no-acl --no-owner -d sentry_development latest.dump
+
