@@ -44,6 +44,7 @@ sentry==6.4.4
 sentry-flowdock==0.1.1
 sentry-github==0.1.2
 sentry-pivotal==0.1.0
+sentry-slack==0.1.0
 -e git+https://github.com/getsentry/sentry-trello.git@198ae6e05c2d525c37a317db2b6e1f7bd73abe21#egg=sentry_trello-master
 setproctitle==1.1.8
 simplejson==3.3.2
