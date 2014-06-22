@@ -1,4 +1,6 @@
-# Gaslight's Sentry
+# Gaslight's [Sentry](https://getsentry.com/welcome/)
+
+![](http://i.imgur.com/UP6TOLm.jpg)
 
 ## Development
 
