@@ -7,11 +7,31 @@ unless you're already Python-ing. You should almost certainly setup
 [virtualenv](http://virtualenv.readthedocs.org/en/latest/) if you haven't
 already.
 
-TODO: finish
-1. clone
-1. pip install
-1. bin/data
-1. sentry run?
+You'll need to create a [GitHub OAuth application][ghapp] in order to use the
+GitHub accounts on production. You can skip this step if you just want
+to run a local instance and won't be cloning production data.
+
+1. `git clone git@github.com:gaslight/sentry.git`
+1. `cd sentry`
+1. `pip install`
+1. (optional) `bin/data`
+
+If you're using production data, you'll have to start the application
+with the GitHub OAuth environment variables, like this:
+
+```sh
+GITHUB_APP_ID=app_id_goes_here \
+GITHUB_API_SECRET=secret_goes_here \
+DATABASE_URL=postgres://localhost/sentry_development \
+sentry --config=sentry.conf.py start
+```
+
+Otherwise, you just need the `DATABASE_URL`:
+
+```sh
+DATABASE_URL=postgres://localhost/sentry_development \
+sentry --config=sentry.conf.py start
+```
 
 ## Deploy
 
@@ -27,4 +47,6 @@ in the gaslight heroku organization.
   `git fetch heroku`
 1. Push
   `git push heroku`
+
+[ghapp]: https://github.com/settings/applications/
 
