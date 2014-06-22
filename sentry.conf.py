@@ -52,9 +52,9 @@ SENTRY_MAIL_LEVEL = logging.WARNING
 EMAIL_SUBJECT_PREFIX = '[Sentry] '
 
 # The reply-to email address for outgoing mail.
-SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'root@localhost')
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'sentry@teamgaslight.com')
 
-ALLOWED_HOSTS = ["localhost", "gaslight-sentry.herokuapp.com", ".gaslight.co"]
+ALLOWED_HOSTS = ["localhost", "gaslight-sentry.herokuapp.com", ".gaslight.co", ".teamgaslight.com"]
 
 # Bcrypt
 # ------
