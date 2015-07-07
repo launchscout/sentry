@@ -1,11 +1,26 @@
 #!/bin/bash
 
+set -x
 set -e
 
-dropdb sentry_development
-createdb sentry_development
+DATABASE='sentry_development'
+HEROKU_APP='gaslight-sentry'
 
-heroku pgbackups:capture --expire --app gaslight-sentry
-curl -Lo latest.dump `heroku pgbackups:url --app gaslight-sentry`
-pg_restore --verbose --no-acl --no-owner -d sentry_development latest.dump
+dropdb ${DATABASE} --if-exists
+createdb ${DATABASE}
+
+if [ -z $BACKUP_ID ]; then
+    # heroku pg:backups capture DATABASE_URL --app ${HEROKU_APP}
+    DUMP_FILE="${HEROKU_APP}-latest.dump"
+else
+    DUMP_FILE="${HEROKU_APP}-${BACKUP_ID}.dump"
+fi
+
+BACKUP_ID=`heroku pg:backups --app ${HEROKU_APP} | grep -Ehom1 "^b\d{3}"`
+BACKUP_URL=`heroku pg:backups public-url ${BACKUP_ID} --app ${HEROKU_APP} | grep -m1 -E "" | sed "s/'//g" | sed "s/ //g"`
+
+if [ ! -f $DUMP_FILE ]; then
+    curl -Lo $DUMP_FILE $BACKUP_URL
+fi
+pg_restore --verbose --no-acl --no-owner -d ${DATABASE} $DUMP_FILE
 
