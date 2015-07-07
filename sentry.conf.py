@@ -129,7 +129,7 @@ SENTRY_FILESTORE_OPTIONS = {
 # Web Server #
 ##############
 
-SENTRY_URL_PREFIX = 'http://localhost:9000'  # No trailing slash!
+SENTRY_URL_PREFIX = os.environ.get('SENTRY_URL_PREFIX', '') # No trailing slash!
 
 # If you're using a reverse proxy, you should enable the X-Forwarded-Proto
 # header and uncomment the following settings
@@ -151,14 +151,14 @@ SENTRY_WEB_OPTIONS = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'localhost'
-EMAIL_HOST_PASSWORD = ''
-EMAIL_HOST_USER = ''
-EMAIL_PORT = 25
-EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_PASSWORD')
+EMAIL_HOST_USER = os.environ.get('SENDGRID_USERNAME')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # The email address to send on behalf of
-SERVER_EMAIL = 'root@localhost'
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'sentry@teamgaslight.com')
 
 # If you're using mailgun for inbound mail, set your API key and configure a
 # route to forward to /api/hooks/mailgun/inbound/
