@@ -1,37 +1,155 @@
-import logging
-import os
-import sys
 
+# This file is just Python, with a touch of Django which means
+# you can inherit and tweak settings to your hearts content.
 from sentry.conf.server import *
 
-ROOT = os.path.dirname(__file__)
+import os.path
 
-sys.path.append(ROOT)
+CONF_ROOT = os.path.dirname(__file__)
 
 import dj_database_url
 DATABASES = {'default': dj_database_url.config()}
 
+# You should not change this setting after your database has been created
+# unless you have altered all schemas first
+SENTRY_USE_BIG_INTS = True
 
-# Sentry configuration
-# --------------------
+# If you're expecting any kind of real traffic on Sentry, we highly recommend
+# configuring the CACHES and Redis settings
 
-SENTRY_KEY = os.environ.get('SENTRY_KEY')
+###########
+# General #
+###########
 
-# Set this to false to require authentication
-SENTRY_PUBLIC = False
+# The administrative email for this installation.
+# Note: This will be reported back to getsentry.com as the point of contact. See
+# the beacon documentation for more information. This **must** be a string.
 
-SENTRY_WEB_HOST = '0.0.0.0'
-SENTRY_WEB_PORT = int(os.environ.get('PORT', 9000))
-SENTRY_WEB_OPTIONS = {
-    'workers': 3,
-    'worker_class': 'gevent',
+SENTRY_ADMIN_EMAIL = 'sentry@gaslight.co'
+
+# Instruct Sentry that this install intends to be run by a single organization
+# and thus various UI optimizations should be enabled.
+SENTRY_SINGLE_ORGANIZATION = False
+
+#########
+# Redis #
+#########
+
+# Generic Redis configuration used as defaults for various things including:
+# Buffers, Quotas, TSDB
+
+SENTRY_REDIS_OPTIONS = {
+    'hosts': {
+        0: {
+            'host': '127.0.0.1',
+            'port': 6379,
+        }
+    }
 }
 
-SENTRY_URL_PREFIX = os.environ.get('SENTRY_URL_PREFIX', '')
+#########
+# Cache #
+#########
 
+# If you wish to use memcached, install the dependencies and adjust the config
+# as shown:
+#
+#   pip install python-memcached
+#
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#         'LOCATION': ['127.0.0.1:11211'],
+#     }
+# }
+#
+# SENTRY_CACHE = 'sentry.cache.django.DjangoCache'
 
-# Email configuration
-# -------------------
+SENTRY_CACHE = 'sentry.cache.redis.RedisCache'
+
+#########
+# Queue #
+#########
+
+# See http://sentry.readthedocs.org/en/latest/queue/index.html for more
+# information on configuring your queue broker and workers. Sentry relies
+# on a Python framework called Celery to manage queues.
+
+CELERY_ALWAYS_EAGER = False
+BROKER_URL = 'redis://localhost:6379'
+
+###############
+# Rate Limits #
+###############
+
+SENTRY_RATELIMITER = 'sentry.ratelimits.redis.RedisRateLimiter'
+
+##################
+# Update Buffers #
+##################
+
+# Buffers (combined with queueing) act as an intermediate layer between the
+# database and the storage API. They will greatly improve efficiency on large
+# numbers of the same events being sent to the API in a short amount of time.
+# (read: if you send any kind of real data to Sentry, you should enable buffers)
+
+SENTRY_BUFFER = 'sentry.buffer.redis.RedisBuffer'
+
+##########
+# Quotas #
+##########
+
+# Quotas allow you to rate limit individual projects or the Sentry install as
+# a whole.
+
+SENTRY_QUOTAS = 'sentry.quotas.redis.RedisQuota'
+
+########
+# TSDB #
+########
+
+# The TSDB is used for building charts as well as making things like per-rate
+# alerts possible.
+
+SENTRY_TSDB = 'sentry.tsdb.redis.RedisTSDB'
+
+################
+# File storage #
+################
+
+# Any Django storage backend is compatible with Sentry. For more solutions see
+# the django-storages package: https://django-storages.readthedocs.org/en/latest/
+
+SENTRY_FILESTORE = 'django.core.files.storage.FileSystemStorage'
+SENTRY_FILESTORE_OPTIONS = {
+    'location': '/tmp/sentry-files',
+}
+
+##############
+# Web Server #
+##############
+
+SENTRY_URL_PREFIX = os.environ.get('SENTRY_URL_PREFIX', '') # No trailing slash!
+
+# If you're using a reverse proxy, you should enable the X-Forwarded-Proto
+# header and uncomment the following settings
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+SENTRY_WEB_HOST = '0.0.0.0'
+SENTRY_WEB_PORT = 9000
+SENTRY_WEB_OPTIONS = {
+    # 'workers': 3,  # the number of gunicorn workers
+    # 'secure_scheme_headers': {'X-FORWARDED-PROTO': 'https'},
+}
+
+###############
+# Mail Server #
+###############
+
+# For more information check Django's documentation:
+#  https://docs.djangoproject.com/en/1.3/topics/email/?from=olddocs#e-mail-backends
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_PASSWORD')
@@ -39,71 +157,61 @@ EMAIL_HOST_USER = os.environ.get('SENDGRID_USERNAME')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-# Disable the default admins (for email)
-ADMINS = ()
-
-# Set Sentry's ADMINS to a raw list of email addresses
-SENTRY_ADMINS = os.environ.get('ADMINS', '').split(',')
-
-# The threshold level to restrict emails to.
-SENTRY_MAIL_LEVEL = logging.WARNING
-
-# The prefix to apply to outgoing emails.
-EMAIL_SUBJECT_PREFIX = '[Sentry] '
-
-# The reply-to email address for outgoing mail.
+# The email address to send on behalf of
 SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'sentry@teamgaslight.com')
 
-ALLOWED_HOSTS = ["localhost", "gaslight-sentry.herokuapp.com", ".gaslight.co", ".teamgaslight.com"]
+# If you're using mailgun for inbound mail, set your API key and configure a
+# route to forward to /api/hooks/mailgun/inbound/
+MAILGUN_API_KEY = ''
 
-# Bcrypt
-# ------
+########
+# etc. #
+########
 
-INSTALLED_APPS += ('django_bcrypt',)
+# If this file ever becomes compromised, it's important to regenerate your SECRET_KEY
+# Changing this value will result in all current sessions being invalidated
+SECRET_KEY = '/7kkXIRfS8rUG8e9FOvX87v42r1U7Dd9eZp4zq2QQ5ixLtBm/KBWdA=='
 
-# Enables bcrypt password migration on a ``check_password()`` call.
-#
-# The hash is also migrated when ``BCRYPT_ROUNDS`` changes.
-BCRYPT_MIGRATE = True
+AUTHENTICATION_BACKENDS = (
+    'social_auth.backends.contrib.github.GithubBackend',
+    'sentry.utils.auth.EmailAuthBackend',
+    'social_auth.backends.contrib.trello.TrelloBackend',
+)
 
-
-# Social Auth
-# -----------
-
+SOCIAL_AUTH_USER_MODEL = AUTH_USER_MODEL = 'sentry.User'
 SOCIAL_AUTH_CREATE_USERS = 'SOCIAL_AUTH_CREATE_USERS' in os.environ
 
+SOCIAL_AUTH_PIPELINE = (
+    'social_auth.backends.pipeline.user.get_username',
+    'social_auth.backends.pipeline.social.social_auth_user',
+    'social_auth.backends.pipeline.associate.associate_by_email',
+    'social_auth.backends.pipeline.misc.save_status_to_session',
+    'social_auth.backends.pipeline.social.associate_user',
+    'social_auth.backends.pipeline.social.load_extra_data',
+    'social_auth.backends.pipeline.user.update_user_details',
+    'social_auth.backends.pipeline.misc.save_status_to_session',
+)
 
-# Twitter
-# -------
-TWITTER_CONSUMER_KEY = os.environ.get('TWITTER_CONSUMER_KEY')
-TWITTER_CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET')
+INITIAL_CUSTOM_USER_MIGRATION = '0108_fix_user'
 
+# Auth engines and the settings required for them to be listed
+AUTH_PROVIDERS = {
+    'github': ('GITHUB_APP_ID', 'GITHUB_API_SECRET'),
+    'trello': ('TRELLO_API_KEY', 'TRELLO_API_SECRET')
+}
 
-# Facebook
-# --------
+import random
 
-FACEBOOK_APP_ID = os.environ.get('FACEBOOK_APP_ID')
-FACEBOOK_API_SECRET = os.environ.get('FACEBOOK_API_SECRET')
+SOCIAL_AUTH_DEFAULT_USERNAME = lambda: random.choice(['Darth Vader', 'Obi-Wan Kenobi', 'R2-D2', 'C-3PO', 'Yoda'])
+SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
 
+SENTRY_FEATURES = {
+    'auth:register': True,
+    'organizations:create': True,
+    'organizations:sso': False,
+    'projects:quotas': True,
+    'projects:release-tracking': True,
+    'teams:create': True,
+}
 
-# Google
-# ------
-
-GOOGLE_OAUTH2_CLIENT_ID = os.environ.get('GOOGLE_OAUTH2_CLIENT_ID')
-GOOGLE_OAUTH2_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH2_CLIENT_SECRET')
-
-
-# GitHub
-# ------
-
-GITHUB_APP_ID = os.environ.get('GITHUB_APP_ID')
-GITHUB_API_SECRET = os.environ.get('GITHUB_API_SECRET')
-GITHUB_EXTENDED_PERMISSIONS = ['repo']
-
-
-# Bitbucket
-# ---------
-
-BITBUCKET_CONSUMER_KEY = os.environ.get('BITBUCKET_CONSUMER_KEY')
-BITBUCKET_CONSUMER_SECRET = os.environ.get('BITBUCKET_CONSUMER_SECRET')
 
