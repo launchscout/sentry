@@ -5,7 +5,7 @@ South==0.8.2
 amqp==1.0.13
 anyjson==0.3.3
 billiard==2.7.3.34
-celery==3.0.24
+celery==5.2.2
 cssutils==0.9.10
 dictshield==0.4.4
 dj-database-url==0.2.2
